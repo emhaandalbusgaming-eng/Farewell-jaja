@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farewell, Mas Jamaludin</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0d1117;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+  color: #fff;
+}
+#leaves { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.leaf {
+  position: absolute;
+  border-radius: 50% 0 50% 0;
+  animation: fall linear infinite;
+  pointer-events: none;
+}
+@keyframes fall {
+  0%   { opacity: 0; top: -5%; transform: translateX(0) rotate(0deg); }
+  10%  { opacity: .6; }
+  100% { top: 108%; transform: translateX(160px) rotate(720deg); opacity: 0; }
+}
+.stage-wrap {
+  position: relative;
+  width: min(960px, 98vw);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.sky-text-wrap {
+  width: 100%;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 20px 20px 12px;
+  opacity: 0;
+  transition: opacity 0.7s;
+}
+.sky-text-wrap.visible { opacity: 1; }
+.sky-line {
+  font-weight: 900;
+  letter-spacing: .4px;
+  line-height: 1.35;
+  text-align: center;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255,255,255,.9);
+  text-shadow: 0 0 20px rgba(255,255,255,.1);
+  transform: translateY(-28px);
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  font-size: clamp(.8rem, 1.5vw, 1.15rem);
+  max-width: 840px;
+}
+.sky-line.big {
+  font-size: clamp(1.4rem, 3.5vw, 2.6rem);
+  -webkit-text-stroke: 2px rgba(243,156,18,.95);
+  text-shadow: 0 0 40px rgba(243,156,18,.4), 0 0 80px rgba(243,156,18,.15);
+}
+.sky-line.reveal {
+  animation: skyReveal 1.15s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes skyReveal {
+  0%   { opacity:0; transform:translateY(-28px); clip-path:inset(0 0 100% 0); }
+  40%  { opacity:1; }
+  100% { opacity:1; transform:translateY(0); clip-path:inset(0 0 0% 0); }
+}
+.cinema-stage {
+  width: 100%;
+  background: linear-gradient(to top, #0d1318, #141c24);
+  border-radius: 12px 12px 0 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0,0,0,.7), 0 6px 24px rgba(0,0,0,.5);
+}
+canvas#stage { display:block; width:100%; image-rendering: pixelated; }
+
+/* STARDEW DIALOG */
+#dialog-box {
+  width: 100%;
+  background: linear-gradient(160deg, #1c1a2e, #12111f);
+  border: 3px solid #c8a96e;
+  border-top: 2px solid #a07840;
+  border-radius: 0 0 12px 12px;
+  padding: 0;
+  min-height: 115px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 8px 28px rgba(0,0,0,.65), inset 0 0 40px rgba(0,0,0,.3);
+}
+#dialog-box::before {
+  content:'';
+  position:absolute;
+  inset: 5px;
+  border: 1px solid rgba(200,169,110,.18);
+  border-radius: 8px;
+  pointer-events:none;
+}
+#dialog-box::after {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(200,169,110,.4), transparent);
+}
+#dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+#dialog-name {
+  display: inline-block;
+  background: linear-gradient(135deg, #c8a96e, #a07840);
+  color: #1a1a2e;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 18px 4px 14px;
+  border-radius: 0 0 10px 0;
+  font-family: 'Courier New', monospace;
+  clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+  padding-right: 28px;
+}
+#dialog-portrait {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 56px;
+  height: 56px;
+  border: 2px solid #c8a96e;
+  border-radius: 8px;
+  background: radial-gradient(circle, #1a1535, #0d1020);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  box-shadow: 0 0 12px rgba(200,169,110,.25), inset 0 0 8px rgba(0,0,0,.4);
+}
+#dialog-text {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(.76rem, 1.5vw, .93rem);
+  color: #f0e6d3;
+  line-height: 1.7;
+  padding: 10px 88px 14px 18px;
+  min-height: 78px;
+  letter-spacing: .3px;
+}
+#dialog-cursor {
+  position: absolute;
+  bottom: 10px;
+  right: 18px;
+  color: #c8a96e;
+  font-size: .9rem;
+  animation: blink .7s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* PROGRESS */
+#progress {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 5;
+}
+.dot { width:7px;height:7px;border-radius:50%;background:rgba(200,169,110,.18);transition:background .3s; }
+.dot.active { background:#c8a96e; box-shadow: 0 0 5px #c8a96e; }
+.dot.done   { background:rgba(200,169,110,.45); }
+
+/* MUSIC BTN */
+#music-btn {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 99;
+  background: rgba(200,169,110,.12);
+  border: 1px solid rgba(200,169,110,.38);
+  color: #c8a96e;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  padding: 7px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'Courier New', monospace;
+}
+#music-btn:hover { background: rgba(200,169,110,.26); }
+
+/* SPLASH SCREEN */
+#splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: radial-gradient(ellipse at center, #1a1230 0%, #0a0814 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; cursor: pointer; transition: opacity .7s ease;
+}
+#splash.hidden { opacity: 0; pointer-events: none; }
+#splash-emoji { font-size: clamp(2.5rem,6vw,4rem); animation: float 2.5s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+#splash-title {
+  font-family:'Courier New',monospace; font-weight:900; letter-spacing:4px;
+  color:#c8a96e; text-align:center; text-shadow:0 0 30px rgba(200,169,110,.55);
+  font-size:clamp(1.1rem,3vw,2rem);
+}
+#splash-sub {
+  font-family:'Courier New',monospace; color:rgba(240,230,211,.55);
+  letter-spacing:2px; text-align:center; font-size:clamp(.7rem,1.8vw,.95rem);
+}
+#splash-btn {
+  margin-top:8px; background:transparent; border:2px solid #c8a96e;
+  color:#c8a96e; font-family:'Courier New',monospace; font-weight:700;
+  letter-spacing:3px; padding:14px 44px; border-radius:6px; cursor:pointer;
+  font-size:clamp(.82rem,2vw,1.05rem); text-transform:uppercase;
+  animation:pulseBorder 1.8s ease-in-out infinite;
+}
+@keyframes pulseBorder {
+  0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,.45);}
+  50%{box-shadow:0 0 0 12px rgba(200,169,110,0);}
+}
+#splash-note {
+  font-size:clamp(.6rem,1.3vw,.78rem); color:rgba(240,230,211,.3);
+  letter-spacing:1px; font-family:'Courier New',monospace; text-align:center;
+}
+</style>
+</head>
+<body>
+
+
+<div id="splash">
+  <div id="splash-emoji">👋</div>
+  <div id="splash-title">FAREWELL, MAS JAMALUDIN</div>
+  <div id="splash-sub">sebuah persembahan dari tim tercinta</div>
+  <button id="splash-btn">▶ MULAI</button>
+  <div id="splash-note">🎵 aktifkan volume untuk musik pengiring</div>
+</div>
+<div id="leaves"></div>
+<button id="music-btn">♪ MUSIK OFF</button>
+
+<div class="stage-wrap">
+  <div class="sky-text-wrap" id="skyWrap">
+    <div class="sky-line" id="s1"></div>
+    <div class="sky-line" id="s2"></div>
+    <div class="sky-line big" id="s3"></div>
+  </div>
+
+  <div class="cinema-stage" id="stageBox">
+    <canvas id="stage"></canvas>
+    <div id="progress"></div>
+  </div>
+
+  <div id="dialog-box">
+    <div id="dialog-header">
+      <div id="dialog-name">— — —</div>
+    </div>
+    <div id="dialog-portrait">🌟</div>
+    <div id="dialog-text"></div>
+    <div id="dialog-cursor">▼</div>
+  </div>
+</div>
+
+<script>
+/* ===== CONFIG ===== */
+const AGENTS = [
+  { name:"Wira",     gender:"m", emoji:"😄", msg:"TL terbaik, selalu bikin suasana kerja jadi menyenangkan! ¡Hasta la vista, capitán!" },
+  { name:"Andre",    gender:"m", emoji:"🌞", msg:"See you when I see you, Mas! The sun will shine on us again." },
+  { name:"Huda",     gender:"m", emoji:"✈️",  msg:"Akan selalu ada kata selamat di setiap kata selamat tinggal, jadi selamat melanjutkan perjalanan brotha, Bon voyage!" },
+  { name:"Fiona",    gender:"f", emoji:"🥰", msg:"Terima kasih Mas Jamal, besok kalau ketemu lagi harus bawa Janis ya!" },
+  { name:"Afwin",    gender:"f", emoji:"🌹", msg:"See you on top mas jaja, keep shine!" },
+  { name:"Nuri",     gender:"f", emoji:"💪", msg:"Aku selalu bangga punya TL mas Jamal!" },
+  { name:"Melinda",  gender:"f", emoji:"😊", msg:"Thank you for making the stressful days bearable with your jokes. Wish you all the best!" },
+  { name:"Soraya",   gender:"f", emoji:"🌸", msg:"Makasih udah jadi TL yg bikin aku betah kerja disini, goodluck for your next journey mas jajaakk!!" },
+  { name:"Sulaiman", gender:"m", emoji:"🙏", msg:"Aku banyak belajar dari mas dan teman-teman semua. Thanks and success always." },
+  { name:"Dwiki",    gender:"f", emoji:"🎓", msg:"Cieee dah lulus :) thanks ilmu dan energi positifnya selama memimpin tim. Sehat dan sukses selalu ya, Ganbatte!!" },
+  { name:"Raka",     gender:"m", emoji:"🏠", msg:"Solo juga rumah, jangan lupa pulang." },
+];
+const TL = { name:"Mas Jaja", emoji:"👑", msg:"Mari semuanya, terima kasih banyak atas kerja keras kalian semua! Sampai jumpa lagi. 🙏" };
+const SKY_TEXTS = [
+  "Setiap perjalanan hebat selalu memiliki garis batasnya sendiri, dan hari ini tugasmu Jamal di sini telah usai ditunaikan dengan sangat indah. Meski rute kita kini tak lagi searah, ruang ini akan selalu menyimpan gema tawa, dedikasi, dan teladan yang tidak akan pernah luntur oleh waktu...",
+  "Karena di sudut ruangan ini, ada orang-orang yang tidak akan pernah melupakan dedikasi, bimbingan, dan setiap tawa yang pernah Mas tinggalkan. Terima kasih atas segalanya, dan sukses selalu di tempat baru! ✨",
+  "Terima kasih Jamaludin."
+];
+
+/* ===== CANVAS ===== */
+const canvas = document.getElementById('stage');
+const ctx    = canvas.getContext('2d');
+const stageEl = document.getElementById('stageBox');
+const BASE_W = 960, BASE_H = 210;
+canvas.width = BASE_W; canvas.height = BASE_H;
+
+function resizeCanvas() {
+  const w = stageEl.getBoundingClientRect().width;
+  canvas.style.width = w + 'px';
+  canvas.style.height = (w * BASE_H / BASE_W) + 'px';
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+const FLOOR_Y = BASE_H - 22;
+const DOOR_X  = BASE_W - 48;
+
+/* ===== OUTFITS ===== */
+const MALE_OUTFITS = [
+  { head:"#f5cba7", body:"#2980b9", sleeve:"#1f618d", detail:"#85c1e9", hair:"#5d4037" },
+  { head:"#f0c890", body:"#27ae60", sleeve:"#1e8449", detail:"#abebc6", hair:"#3e2723" },
+  { head:"#fdebd0", body:"#8e44ad", sleeve:"#6c3483", detail:"#d7bde2", hair:"#212121" },
+  { head:"#f5cba7", body:"#2c3e50", sleeve:"#1a252f", detail:"#f1c40f", hair:"#4e342e" },
+  { head:"#fdebd0", body:"#c0392b", sleeve:"#922b21", detail:"#fadbd8", hair:"#1a1a1a" },
+];
+const FEMALE_OUTFITS = [
+  { head:"#fad7a0", body:"#e91e8c", sleeve:"#c2185b", detail:"#f8bbd0", hair:"#3e2723" },
+  { head:"#fdebd0", body:"#9c27b0", sleeve:"#7b1fa2", detail:"#e1bee7", hair:"#1a1a1a" },
+  { head:"#fad7a0", body:"#ff7043", sleeve:"#e64a19", detail:"#ffccbc", hair:"#4e342e" },
+  { head:"#fdebd0", body:"#00897b", sleeve:"#00695c", detail:"#b2dfdb", hair:"#212121" },
+  { head:"#fad7a0", body:"#5c6bc0", sleeve:"#3949ab", detail:"#c5cae9", hair:"#6d4c41" },
+  { head:"#fdebd0", body:"#d81b60", sleeve:"#ad1457", detail:"#fce4ec", hair:"#3e2723" },
+];
+const TL_OUTFIT = { head:"#f7e7c7", body:"#f39c12", sleeve:"#d68910", detail:"#ffeaa7", hair:"#1a1a1a" };
+
+let mIdx=0, fIdx=0;
+const agentOutfits = AGENTS.map(a =>
+  a.gender==='m' ? MALE_OUTFITS[mIdx++ % MALE_OUTFITS.length]
+                 : FEMALE_OUTFITS[fIdx++ % FEMALE_OUTFITS.length]
+);
+
+/* ===== POSITIONS ===== */
+const spacing = (BASE_W * 0.63) / 12;
+const agents = AGENTS.map((a,i)=>({ x: 45 + i*spacing, y: FLOOR_Y, waveY:0 }));
+const tl = { x: BASE_W*0.78, y: FLOOR_Y, waveY:0, opacity:1, status:"listening" };
+
+/* ===== TIMING (15% slower) ===== */
+const BUBBLE_DUR  = 420; // ~7 detik @60fps — cukup untuk baca pesan terpanjang
+const WAVE_FRAMES = 260; // ~4.3 detik TL melambaikan tangan sebelum jalan
+
+/* ===== PIXEL DRAW ===== */
+function shade(hex, amt) {
+  const n=parseInt(hex.slice(1),16);
+  const c=v=>Math.max(0,Math.min(255,v+amt));
+  const r=c((n>>16)&255),g=c((n>>8)&255),b=c(n&255);
+  return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+}
+
+function drawPixelPerson(cx, x, y, outfit, facingLeft, waveY, anim) {
+  const U=3;
+  const bob      = anim&&anim.bob      || 0;
+  const walk     = anim&&anim.walk     || 0;
+  const legPhase = anim&&anim.legPhase || 0;
+  const isFemale = !!outfit.detail && FEMALE_OUTFITS.includes(outfit);
+  const { head, body, sleeve, detail, hair } = outfit;
+
+  const headHi=shade(head,28); const headLo=shade(head,-28);
+  const bodyHi=shade(body,24); const bodyLo=shade(body,-32);
+  const slvHi =shade(sleeve,18); const slvLo=shade(sleeve,-22);
+  const side  = facingLeft?-1:1;
+  const fY = y + bob;
+  const hY = fY - 52;
+
+  // Shadow
+  cx.save();
+  cx.globalAlpha=0.1;
+  cx.fillStyle="#000";
+  cx.beginPath();
+  cx.ellipse(x, fY+U, U*5.5, U*1.6, 0, 0, Math.PI*2);
+  cx.fill();
+  cx.restore();
+
+  // --- LEGS / BOTTOM ---
+  if (isFemale) {
+    // skirt
+    cx.fillStyle = shade(body,-8);
+    cx.beginPath();
+    cx.moveTo(x-U*3, fY-U*4);
+    cx.lineTo(x-U*5, fY);
+    cx.lineTo(x+U*5, fY);
+    cx.lineTo(x+U*3, fY-U*4);
+    cx.fill();
+    // shoes
+    cx.fillStyle = shade(hair,10);
+    cx.fillRect(x-U*4, fY-U, U*2, U*2);
+    cx.fillRect(x+U*2, fY-U, U*2, U*2);
+    // long hair sides
+    cx.fillStyle = hair;
+    cx.fillRect(x-U*4, hY+U*4, U*2, U*9);
+    cx.fillRect(x+U*2, hY+U*4, U*2, U*9);
+  } else {
+    // pants + shoes
+    const ls = U*0.9*walk;
+    const lL = Math.sin(legPhase*Math.PI*2)*0.5+0.5;
+    const rL = 1-lL;
+    const lyL = fY + (-ls*(lL-0.5))*0.9;
+    const lyR = fY + ( ls*(rL-0.5))*0.9;
+    cx.fillStyle = shade(body,-28);
+    cx.fillRect(x-U*3, lyL, U*3, U*4);
+    cx.fillRect(x+U,   lyR, U*3, U*4);
+    cx.fillStyle = shade(hair,5);
+    cx.fillRect(x-U*3, lyL+U*3, U*3, U*1.5);
+    cx.fillRect(x+U,   lyR+U*3, U*3, U*1.5);
+  }
+
+  // --- TORSO ---
+  const torsoH = isFemale ? 9 : 11;
+  cx.fillStyle = body;
+  cx.fillRect(x-U*3, fY-U*(torsoH+4), U*7, U*torsoH);
+  cx.fillStyle = bodyLo;
+  cx.fillRect(x+side*U*4, fY-U*(torsoH+4), side*U*0.7, U*torsoH);
+  cx.fillStyle = bodyHi;
+  cx.fillRect(x-U*2, fY-U*(torsoH+3), U*4, U*2);
+
+  // collar/detail
+  cx.fillStyle = detail;
+  cx.fillRect(x-U, fY-U*(torsoH+2), U*2, U*3);
+  for(let di=0;di<2;di++) for(let dj=0;dj<2;dj++) {
+    cx.fillRect(x-U*2+di*U*2.4, fY-U*(torsoH-1)+dj*U*2, 2, 2);
+  }
+
+  // --- NECK ---
+  cx.fillStyle = head;
+  cx.fillRect(x-U, fY-U*(torsoH+5), U*2, U*3);
+
+  // --- HEAD ---
+  cx.fillStyle = head;
+  cx.fillRect(x-U*3, hY, U*6, U*6);
+  cx.fillStyle = headHi;
+  cx.fillRect(x-U*2, hY, U*3, U*2);
+  cx.fillStyle = headLo;
+  cx.fillRect(x-U*3, hY+U*4, U*6, U*2);
+  // eyes
+  cx.fillStyle = "#1a1a1a";
+  cx.fillRect(x-U*2, hY+U*2, U, U);
+  cx.fillRect(x+U,   hY+U*2, U, U);
+  // smile
+  cx.fillStyle = headLo;
+  cx.fillRect(x-U, hY+U*4, U*3, U*0.7);
+
+  // --- HAIR ---
+  cx.fillStyle = hair||"#3e2723";
+  if(isFemale) {
+    cx.fillRect(x-U*3, hY-U*2, U*6, U*3);  // top
+    cx.fillRect(x-U*4, hY, U*1.5, U*3);    // left
+    cx.fillRect(x+U*2+U*0.5, hY, U*1.5, U*3); // right
+  } else {
+    cx.fillRect(x-U*3, hY, U*6, U*2);
+    cx.fillRect(x+(facingLeft?-U*3:U*2), hY+U*2, U*1.5, U*2);
+  }
+
+  // --- ARMS ---
+  const shY = fY - U*(torsoH+3);
+  // static arm
+  const stX = facingLeft ? x+U*3 : x-U*4;
+  cx.fillStyle = sleeve;
+  cx.fillRect(stX, shY, U*2, U*5);
+  cx.fillStyle = slvLo;
+  cx.fillRect(stX+side*U, shY+U, U, U*4);
+
+  // waving arm
+  cx.save();
+  const angle = (waveY||0)*0.4;
+  const pvX = facingLeft ? x-U*2 : x+U*2;
+  cx.translate(pvX, shY);
+  if(angle!==0) cx.rotate(angle);
+  cx.fillStyle = sleeve;
+  cx.fillRect(facingLeft?-U*2:0, 0, U*2, U*5);
+  cx.fillStyle = slvHi;
+  cx.fillRect(facingLeft?-U*2:0, 0, U*2, U*2);
+  // hand
+  cx.fillStyle = head;
+  cx.fillRect(facingLeft?-U*2.5:U*.2, U*4, U*2, U*2);
+  cx.restore();
+}
+
+/* ===== OFFICE ===== */
+function drawOffice(cx) {
+  const W=BASE_W, H=BASE_H;
+  // wall lines
+  cx.strokeStyle="rgba(255,255,255,.045)"; cx.lineWidth=1;
+  for(let i=0;i<10;i++){
+    const wx=40+i*92;
+    cx.beginPath(); cx.moveTo(wx,8); cx.lineTo(wx+18,88); cx.stroke();
+  }
+  // monitors
+  for(let i=0;i<9;i++){
+    const mx=50+i*103, dY=105, mY=44;
+    cx.fillStyle="rgba(255,255,255,.04)"; cx.fillRect(mx-10,dY-24,18,28);
+    cx.fillStyle="rgba(40,120,200,.18)";  cx.fillRect(mx-17,mY,34,21);
+    cx.fillStyle="rgba(255,255,255,.07)"; cx.fillRect(mx-17,mY,9,21);
+    cx.fillStyle="rgba(255,234,167,.25)"; cx.fillRect(mx-8,mY+7,8,4);
+  }
+  // desk
+  cx.fillStyle="rgba(255,255,255,.055)"; cx.fillRect(18,108,W-36,14);
+  // door glow
+  const dx=DOOR_X-22, dh=120, dw=46;
+  const grad=cx.createLinearGradient(dx,0,dx+dw,0);
+  grad.addColorStop(0,"rgba(255,255,255,0)");
+  grad.addColorStop(.4,"rgba(255,234,167,.75)");
+  grad.addColorStop(1,"rgba(255,234,167,.92)");
+  cx.fillStyle=grad;
+  cx.beginPath(); cx.roundRect(dx,H-dh-18,dw,dh,5); cx.fill();
+  cx.save();
+  cx.shadowColor="rgba(255,234,167,.45)"; cx.shadowBlur=26;
+  cx.fillStyle="rgba(255,234,167,.06)";
+  cx.fillRect(dx-26,H-dh-18,dw+52,dh+18);
+  cx.restore();
+  // floor
+  cx.fillStyle="#0d1318"; cx.fillRect(0,H-20,W,20);
+  const fg=cx.createLinearGradient(0,H-20,0,H);
+  fg.addColorStop(0,"rgba(255,255,255,.055)"); fg.addColorStop(1,"rgba(255,255,255,0)");
+  cx.fillStyle=fg; cx.fillRect(0,H-20,W,20);
+}
+
+/* ===== DIALOG ===== */
+const dialogName     = document.getElementById('dialog-name');
+const dialogText     = document.getElementById('dialog-text');
+const dialogPortrait = document.getElementById('dialog-portrait');
+let twTimer = null;
+
+function showDialog(name, emoji, msg) {
+  dialogName.textContent = name;
+  dialogPortrait.textContent = emoji;
+  dialogText.textContent = '';
+  if(twTimer) clearInterval(twTimer);
+  let i=0;
+  twTimer = setInterval(()=>{
+    if(i<msg.length) dialogText.textContent += msg[i++];
+    else { clearInterval(twTimer); twTimer=null; }
+  }, 38);
+}
+function clearDialog() {
+  if(twTimer){ clearInterval(twTimer); twTimer=null; }
+  dialogName.textContent='— — —';
+  dialogText.textContent='';
+  dialogPortrait.textContent='🌟';
+}
+
+/* ===== PROGRESS DOTS ===== */
+const progressEl = document.getElementById('progress');
+for(let i=0;i<11;i++){
+  const d=document.createElement('div');
+  d.className='dot'; d.id='dot'+i;
+  progressEl.appendChild(d);
+}
+function updateDots(cur){
+  for(let i=0;i<11;i++){
+    const d=document.getElementById('dot'+i);
+    d.className = i<cur?'dot done': i===cur?'dot active':'dot';
+  }
+}
+
+/* ===== SKY TEXT ===== */
+let skyShown=false;
+function showSkyText(){
+  if(skyShown) return; skyShown=true;
+  const wrap=document.getElementById('skyWrap');
+  wrap.classList.add('visible');
+  const lines=[document.getElementById('s1'),document.getElementById('s2'),document.getElementById('s3')];
+  SKY_TEXTS.forEach((t,i)=>{ lines[i].textContent=t; });
+  setTimeout(()=>lines[0].classList.add('reveal'), 300);
+  setTimeout(()=>lines[1].classList.add('reveal'), 1800);
+  setTimeout(()=>lines[2].classList.add('reveal'), 3400);
+}
+
+/* ===== SAD MUSIC (Web Audio) ===== */
+let audioCtx=null, musicPlaying=false, loopTimeout=null;
+
+function note(freq, start, dur, vol, ac){
+  const osc=ac.createOscillator();
+  const g=ac.createGain();
+  const irLen=ac.sampleRate*1.5;
+  const ir=ac.createBuffer(2,irLen,ac.sampleRate);
+  for(let c=0;c<2;c++){
+    const d=ir.getChannelData(c);
+    for(let i=0;i<irLen;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/irLen,2.8);
+  }
+  const rev=ac.createConvolver(); rev.buffer=ir;
+  const wet=ac.createGain(); wet.gain.value=0.35;
+  const master=ac.createGain(); master.gain.value=0.42;
+
+  osc.type='triangle';
+  osc.frequency.setValueAtTime(freq,start);
+  g.gain.setValueAtTime(0,start);
+  g.gain.linearRampToValueAtTime(vol,start+0.06);
+  g.gain.exponentialRampToValueAtTime(0.001,start+dur);
+
+  osc.connect(g);
+  g.connect(rev); rev.connect(wet); wet.connect(master);
+  g.connect(master);
+  master.connect(ac.destination);
+  osc.start(start); osc.stop(start+dur+0.15);
+}
+
+// Melancholic Am pentatonic melody ~18s loop
+const MELODY=[
+  [440,0.0,1.0,.55],[392,1.15,.85,.45],[329.63,2.1,1.2,.5],[293.66,3.45,.8,.4],
+  [261.63,4.3,1.3,.45],[220,5.7,1.5,.5],[261.63,7.3,.75,.38],[293.66,8.15,.7,.38],
+  [329.63,8.95,1.15,.45],[392,10.2,.9,.5],[440,11.2,.75,.45],[392,12.0,.7,.4],
+  [329.63,12.8,1.3,.45],[293.66,14.2,.85,.38],[261.63,15.15,.95,.42],[220,16.2,2.2,.52]
+];
+const BASS=[
+  [110,0.0,3.9,.26],[87.31,4.1,3.9,.26],[130.81,8.1,3.9,.26],[98,12.1,5.8,.26]
+];
+// Add a gentle high harmony
+const HARM=[
+  [659,0.5,.7,.18],[587.33,2.5,.8,.16],[523.25,5.0,.9,.18],
+  [659,9.5,.7,.16],[587.33,12.5,.8,.16],[523.25,15.5,1.2,.2]
+];
+
+function playLoop(ac, at){
+  [...MELODY,...BASS,...HARM].forEach(([f,t,d,v])=>note(f,at+t,d,v,ac));
+}
+
+function startMusic(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume();
+  musicPlaying=true;
+  const LOOP=18.5;
+  playLoop(audioCtx, audioCtx.currentTime);
+  playLoop(audioCtx, audioCtx.currentTime+LOOP);
+  function sched(){
+    if(!musicPlaying) return;
+    playLoop(audioCtx, audioCtx.currentTime+LOOP);
+    loopTimeout=setTimeout(sched, LOOP*1000);
+  }
+  loopTimeout=setTimeout(sched, LOOP*1000);
+  document.getElementById('music-btn').textContent='♪ MUSIK OFF';
+}
+function stopMusic(){
+  musicPlaying=false;
+  clearTimeout(loopTimeout);
+  if(audioCtx){ audioCtx.close(); audioCtx=null; }
+  document.getElementById('music-btn').textContent='♪ MUSIK ON';
+}
+document.getElementById('music-btn').addEventListener('click',()=>{
+  if(musicPlaying) stopMusic(); else startMusic();
+});
+
+// SPLASH: tap/click to start
+document.getElementById('splash-btn').addEventListener('click', launchApp);
+document.getElementById('splash').addEventListener('click', function(e){
+  if(e.target===this) launchApp();
+});
+function launchApp(){
+  const splash = document.getElementById('splash');
+  splash.classList.add('hidden');
+  setTimeout(()=>{ splash.style.display='none'; }, 750);
+  startMusic();
+}
+
+/* ===== ANIMATION STATE ===== */
+let currentSpeaker=0, bubbleTimer=0, loopDone=false;
+
+/* ===== MAIN LOOP ===== */
+function resetScene(){
+  tl.x=BASE_W*0.78; tl.status="listening"; tl.opacity=1;
+  currentSpeaker=0; bubbleTimer=0; loopDone=false; skyShown=false;
+  const wrap=document.getElementById('skyWrap');
+  wrap.classList.remove('visible');
+  ['s1','s2','s3'].forEach(id=>{
+    const el=document.getElementById(id);
+    el.classList.remove('reveal'); el.textContent='';
+  });
+  showDialog(AGENTS[0].name,AGENTS[0].emoji,AGENTS[0].msg);
+  updateDots(0);
+}
+
+function animate(){
+  ctx.clearRect(0,0,BASE_W,BASE_H);
+  const bg=ctx.createLinearGradient(0,0,0,BASE_H);
+  bg.addColorStop(0,"#1a252f"); bg.addColorStop(1,"#11171d");
+  ctx.fillStyle=bg; ctx.fillRect(0,0,BASE_W,BASE_H);
+  drawOffice(ctx);
+  const now=Date.now();
+
+  // Draw agents
+  agents.forEach((ag,i)=>{
+    let wy=0;
+    if(tl.status==="listening" && i===currentSpeaker)
+      wy=Math.sin(now*0.013)*0.65-1.05;
+    else if(tl.status==="waving"||tl.status==="walking")
+      wy=Math.sin(now*0.009+i*0.5)*0.55-0.95;
+    ag.waveY=wy;
+    const bob=Math.sin(now*0.006+i*0.38)*0.75;
+    const legPhase=(now*0.004+i*0.3)%1;
+    drawPixelPerson(ctx,ag.x,ag.y,agentOutfits[i],false,wy,{bob,walk:0,legPhase});
+  });
+
+  // State machine
+  if(tl.status==="listening"){
+    bubbleTimer++;
+    if(bubbleTimer>=BUBBLE_DUR){
+      bubbleTimer=0;
+      currentSpeaker++;
+      if(currentSpeaker>=11){
+        tl.status="waving";
+        showDialog(TL.name,TL.emoji,TL.msg);
+        updateDots(11);
+      } else {
+        const ag=AGENTS[currentSpeaker];
+        showDialog(ag.name,ag.emoji,ag.msg);
+        updateDots(currentSpeaker);
+      }
+    }
+    tl.waveY=Math.sin(now*0.005)*0.28;
+  }
+  if(tl.status==="waving"){
+    tl.waveY=Math.sin(now*0.014)*0.7-1.15;
+    bubbleTimer++;
+    if(bubbleTimer>WAVE_FRAMES){ tl.status="walking"; bubbleTimer=0; clearDialog(); }
+  }
+  if(tl.status==="walking"){
+    tl.waveY=Math.sin(now*0.022)*0.22;
+    tl.x+=1.5;
+    if(tl.x>=DOOR_X-4) tl.status="gone";
+  }
+  if(tl.status==="gone"){
+    tl.opacity-=0.015;
+    if(tl.opacity<=0){
+      tl.opacity=0;
+      if(!loopDone){ loopDone=true; showSkyText(); setTimeout(resetScene,31000); }
+    }
+  }
+
+  // Draw TL
+  if(tl.opacity>0){
+    ctx.save();
+    ctx.globalAlpha=tl.opacity;
+    const facingLeft=(tl.status==="waving");
+    const bob=Math.sin(now*0.01)*0.85*(tl.status==='walking'?1:.55);
+    const walk=tl.status==='walking'?1:0;
+    const legPhase=(now*0.028)%1;
+    drawPixelPerson(ctx,tl.x,tl.y,TL_OUTFIT,facingLeft,tl.waveY,{bob,walk,legPhase});
+    ctx.restore();
+  }
+
+  requestAnimationFrame(animate);
+}
+
+// Init
+showDialog(AGENTS[0].name,AGENTS[0].emoji,AGENTS[0].msg);
+updateDots(0);
+animate();
+
+/* ===== LEAVES ===== */
+const leavesEl=document.getElementById('leaves');
+for(let i=0;i<22;i++){
+  const l=document.createElement('div'); l.className='leaf';
+  const sz=Math.random()*10+7;
+  const cols=['rgba(243,156,18,.2)','rgba(230,126,34,.16)','rgba(241,196,15,.12)'];
+  Object.assign(l.style,{
+    width:sz+'px', height:sz+'px', left:Math.random()*100+'%',
+    background:cols[Math.floor(Math.random()*cols.length)],
+    animationDuration:(Math.random()*7+9)+'s',
+    animationDelay:(Math.random()*12)+'s',
+  });
+  leavesEl.appendChild(l);
+}
+</script>
+</body>
+</html>
